@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  lint:
+    name: Lint Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff
+        run: ruff check setup_claude.py
+
+  test-dry-run:
+    name: Test dry-run on fake repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Create a fake repo to test against
+        run: |
+          mkdir -p /tmp/fake-repo/src
+          cd /tmp/fake-repo
+          git init
+          git config user.email "ci@test.com"
+          git config user.name "CI"
+
+          # Simulate a small project (< 50 files) → no graph tools expected
+          for i in $(seq 1 20); do
+            echo "def func_$i(): pass" > src/module_$i.py
+          done
+          git add . && git commit -m "small project"
+
+      - name: Run dry-run on small project (expect: no graph tools)
+        run: |
+          cp setup_claude.py /tmp/fake-repo/
+          cd /tmp/fake-repo
+          python setup_claude.py --dry-run | grep -q "early stage" && echo "✅ small project: correct" || (echo "❌ small project: wrong output" && exit 1)
+
+      - name: Grow the fake repo to mature size (> 80 files)
+        run: |
+          cd /tmp/fake-repo
+          for i in $(seq 21 100); do
+            echo "def func_$i(): pass" > src/module_$i.py
+          done
+          git add . && git commit -m "mature project"
+
+      - name: Run dry-run on mature project (expect: graph tools active)
+        run: |
+          cd /tmp/fake-repo
+          python setup_claude.py --dry-run | grep -q "Graphify" && echo "✅ mature project: correct" || (echo "❌ mature project: wrong output" && exit 1)
+
+      - name: Verify CLAUDE.md markers are present after apply
+        run: |
+          cd /tmp/fake-repo
+          python setup_claude.py
+          grep -q "graph-tools:start" CLAUDE.md && echo "✅ markers present" || (echo "❌ markers missing" && exit 1)
+
+      - name: Re-run apply and verify idempotency (no duplicate blocks)
+        run: |
+          cd /tmp/fake-repo
+          python setup_claude.py
+          count=$(grep -c "graph-tools:start" CLAUDE.md)
+          [ "$count" -eq 1 ] && echo "✅ idempotent: single block" || (echo "❌ duplicate block detected ($count)" && exit 1)
