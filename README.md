@@ -1,5 +1,7 @@
 # claude-code-graph-setup
 
+[![CI](https://github.com/JEMAIZ/claude-code-graph-setup/actions/workflows/ci.yml/badge.svg)](https://github.com/JEMAIZ/claude-code-graph-setup/actions/workflows/ci.yml)
+
 > **EN** — Automatically configure Claude Code with knowledge graph tools, adapted to your project size.
 >
 > **FR** — Configure automatiquement Claude Code avec des outils de knowledge graph, adaptés à la taille de ton projet.
@@ -140,10 +142,13 @@ Le script injecte un bloc `<!-- graph-tools:start -->` / `<!-- graph-tools:end -
 
 ```
 claude-code-graph-setup/
-├── setup_claude.py          # main script
+├── setup_claude.py           # main script
 ├── prompt_setup_universel.md # Claude Code prompt to install tools + merge CLAUDE.md
 ├── .claude/
-│   └── graphs.md            # detailed graph tool reference (loaded on demand)
+│   └── graphs.md             # detailed graph tool reference (loaded on demand)
+├── .github/
+│   └── workflows/
+│       └── ci.yml            # lint + dry-run tests on every push
 └── README.md
 ```
 
