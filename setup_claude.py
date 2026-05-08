@@ -68,7 +68,7 @@ def check_installed(root: Path) -> dict[str, bool]:
 def _crg_in_mcp(root: Path) -> bool:
     for fname in [".mcp.json", ".claude/settings.json"]:
         p = root / fname
-        if p.exists() and "code-review-graph" in p.read_text():
+        if p.exists() and "code-review-graph" in p.read_text(encoding="utf-8", errors="replace"):
             return True
     return False
 
@@ -165,7 +165,7 @@ def merge_into_claude_md(root: Path, new_section: str) -> None:
     marker_end   = "<!-- graph-tools:end -->"
 
     if claude_md.exists():
-        content = claude_md.read_text()
+        content = claude_md.read_text(encoding="utf-8", errors="replace")
         if marker_start in content:
             # Remplace le bloc existant
             before = content.split(marker_start)[0]
@@ -182,7 +182,7 @@ def merge_into_claude_md(root: Path, new_section: str) -> None:
         print(updated)
         print("────────────────────────────────────────────────────────")
     else:
-        claude_md.write_text(updated)
+        claude_md.write_text(updated, encoding="utf-8")
         print(f"✅ CLAUDE.md mis à jour ({claude_md})")
 
 
