@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+
+# Graph outputs (generated locally, not committed)
+graphify-out/
+.understand-anything/intermediate/
+.understand-anything/diff-overlay.json
+
+# OS
+.DS_Store
+Thumbs.db
