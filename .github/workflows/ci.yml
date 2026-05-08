@@ -54,7 +54,7 @@ jobs:
           cd /tmp/fake-repo
           output=$(python setup_claude.py --dry-run)
           echo "$output"
-          echo "$output" | grep -q "early stage"
+          echo "$output" | grep -q "petit"
 
       - name: Grow repo to mature size
         run: |

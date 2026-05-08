@@ -8,7 +8,6 @@ Usage :
   python setup_claude.py --dry-run # aperçu sans écrire
 """
 
-import os
 import sys
 import subprocess
 from pathlib import Path
